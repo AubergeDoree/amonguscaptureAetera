@@ -172,6 +172,7 @@ namespace AmongUsCapture {
                         SkinId = player.SkinId,
                         PetId = player.PetId
                     });
+                    Console.WriteLine(player.GetPlayerName() + " joined the lobby, Region is : " + GetPlayRegion(memInstance));
                 }
                 else {
                     // player was here before, we have an old playerInfo to compare against
@@ -230,7 +231,22 @@ namespace AmongUsCapture {
         }
 
         private PlayRegion GetPlayRegion(ProcessMemory memInstance) {
-            return (PlayRegion) ((4 - (memInstance.Read<int>(GameAssemblyPtr, CurrentOffsets.PlayRegionOffsets) & 0b11)) % 3); // do NOT ask
+            return ValueToRegion(memInstance.Read<int>(GameAssemblyPtr, CurrentOffsets.PlayRegionOffsets)); // do NOT ask
+        }
+
+        PlayRegion ValueToRegion(int x) {
+            switch (x) {
+                case 13: 
+                    return PlayRegion.NorthAmerica;
+                case 6: 
+                    return PlayRegion.Europe;
+                case 4: 
+                    return PlayRegion.Asia;
+                case 36: 
+                    return PlayRegion.ModdedServer;
+                default: 
+                    return PlayRegion.Europe;
+    }
         }
 
         private PlayMap GetMap(ProcessMemory memInstance) {
@@ -502,13 +518,41 @@ namespace AmongUsCapture {
         Banana = 14,
         Gray = 15,
         Tan = 16,
-        Coral = 17
+        Coral = 17,
+        Tamarind = 18,
+        Army = 19,
+        Olive = 20,
+        Turquoise = 21,
+        Mint = 22,
+        Lavender = 23,
+        Nougat = 24,
+        Peach = 25,
+        Wasabi = 26,
+        HotPink = 27,
+        Petrol = 28,
+        Lemon = 29,
+        SignalOrange = 30,
+        Teal = 31,
+        Blurple = 32,
+        Sunrise = 33,
+        Ice = 34,
+        Fuchsia = 35,
+        RoyalGreen = 36,
+        Slime = 37,
+        Navy = 38,
+        Darkness = 39,
+        Ocean = 40,
+        Sundown = 41,
+        Unknown = 999
     }
 
     public enum PlayRegion {
         NorthAmerica = 0,
-        Asia = 1,
-        Europe = 2
+        Europe = 1,
+        Asia = 2,
+        ModdedServer = 3,
+        Aetera = 4,
+        BOR = 5,
     }
 
     public enum PlayMap {

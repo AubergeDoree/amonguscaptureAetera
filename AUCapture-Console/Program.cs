@@ -25,7 +25,9 @@ namespace AUCapture_Console
 
         static void Main(string[] args)
         {
+        {
             Console.WriteLine(Process.GetCurrentProcess().MainModule.ModuleName);
+            Console.WriteLine("Program.cs:30 -> Call here !");
             var uriStart = IPCAdapter.getInstance().HandleURIStart(args);
             
             switch (uriStart)
@@ -68,6 +70,7 @@ namespace AUCapture_Console
         private static void OnJoinedLobby(object? sender, LobbyEventArgs e)
         {
             Logger.Debug("Joined lobby: {lobbyCode}", e.LobbyCode);
+            Console.WriteLine("Joined lobby: " + e.lobbyCode + ", Region: " + e.Region);
         }
         
 

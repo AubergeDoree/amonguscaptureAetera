@@ -482,6 +482,9 @@ namespace AUCapture_WPF {
                     Dispatcher.Invoke(() => {
                         switch (e.Action) {
                             case PlayerAction.ChangedColor:
+                                
+                                Console.WriteLine(player.Name + " changed color for " + e.Color);
+
                                 player.Color = e.Color;
                                 break;
 
@@ -498,10 +501,13 @@ namespace AUCapture_WPF {
                     });
                 }
                 else {
-                    if (e.Action == PlayerAction.Joined) Dispatcher.Invoke(() => { context.Players.Add(new Player(e.Name, e.Color, !e.IsDead, 0, 0, 0)); });
+                    if (e.Action == PlayerAction.Joined) {
+                        Dispatcher.Invoke(() => { context.Players.Add(new Player(e.Name, e.Color, !e.IsDead, 0, 0, 0)); });
+                    }
                 }
             }
             Logger.Debug("{@e}", e);
+            Console.WriteLine(e);
         }
 
 
@@ -510,6 +516,7 @@ namespace AUCapture_WPF {
         private void OnJoinedLobby(object sender, LobbyEventArgs e) {
             context.GameCode = e.LobbyCode;
             context.GameMap = e.Map;
+
             this.BeginInvoke(a => {
                 if (context.Settings.AlwaysCopyGameCode) Clipboard.SetText(e.LobbyCode);
             });
@@ -571,6 +578,72 @@ namespace AUCapture_WPF {
                     break;
                 case PlayerColor.Coral:
                     OutputCode = Color.LightCoral;
+                    break;
+                case PlayerColor.Tamarind:
+                    OutputCode = Color.FromArgb( 48,  28,  34);
+                    break;
+                case PlayerColor.Army:
+                    OutputCode = Color.FromArgb( 39,  45,  31);
+                    break;
+                case PlayerColor.Olive:
+                    OutputCode = Color.FromArgb(154, 140,  61);
+                    break;
+                case PlayerColor.Turquoise:
+                    OutputCode = Color.FromArgb( 22, 132, 176);
+                    break;
+                case PlayerColor.Mint:
+                    OutputCode = Color.FromArgb(111, 192, 156);
+                    break;
+                case PlayerColor.Lavender:
+                    OutputCode = Color.FromArgb(173, 126, 201);
+                    break;
+                case PlayerColor.Nougat:
+                    OutputCode = Color.FromArgb(160, 101,  56);
+                    break;
+                case PlayerColor.Wasabi:
+                    OutputCode = Color.FromArgb(112, 143,  46);
+                    break;
+                case PlayerColor.HotPink:
+                    OutputCode = Color.FromArgb(255,  51, 102);
+                    break;
+                case PlayerColor.Petrol:
+                    OutputCode = Color.FromArgb(  0,  99, 105);
+                    break;
+                case PlayerColor.Lemon:
+                    OutputCode = Color.FromArgb(219, 253,  47);
+                    break;
+                case PlayerColor.Teal:
+                    OutputCode = Color.FromArgb( 37, 184, 191);
+                    break;
+                case PlayerColor.Blurple:
+                    OutputCode = Color.FromArgb( 61,  44, 142);
+                    break;
+                case PlayerColor.Sunrise:
+                    OutputCode = Color.FromArgb(255, 202,  25);
+                    break;
+                case PlayerColor.Ice:
+                    OutputCode = Color.FromArgb( 25, 223, 255);
+                    break;
+                case PlayerColor.Fuchsia:
+                    OutputCode = Color.FromArgb(164,  17, 129);
+                    break;
+                case PlayerColor.RoyalGreen:
+                    OutputCode = Color.FromArgb(  9,  82,  33);
+                    break;
+                case PlayerColor.Slime:
+                    OutputCode = Color.FromArgb(244, 255, 188);
+                    break;
+                case PlayerColor.Navy:
+                    OutputCode = Color.FromArgb(  9,  43, 119);
+                    break;
+                case PlayerColor.Darkness:
+                    OutputCode = Color.FromArgb( 36,  39,  40);
+                    break;
+                case PlayerColor.Ocean:
+                    OutputCode = Color.FromArgb( 55, 159, 218);
+                    break;
+                case PlayerColor.Sundown:
+                    OutputCode = Color.FromArgb(252, 194, 100);
                     break;
             }
 

@@ -1,17 +1,20 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using AUOffsetManager;
 using Discord;
+using NLog;
 
 namespace AmongUsCapture
 {
     
     public class PlayerInfo
     {
+        private static List<uint> UnknownColors = new List<uint>();
         public byte PlayerId;
 
         public string PlayerName;
-        public PlayerColor ColorId;
+        public PlayerColor ColorId = PlayerColor.Unknown;
         public uint HatId;
         public uint PetId;
         public uint SkinId;
@@ -25,10 +28,12 @@ namespace AmongUsCapture
         public IntPtr Tasks;
         public bool IsImpostor;
         public bool IsDead;
+        public uint realColorID;
 
         public IntPtr _object; //Assume this always has largest offset
-
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
         public PlayerInfo(IntPtr baseAddr, ProcessMemory MemInstance, GameOffsets CurrentOffsets) {
+            bool LogCastError = false;
             unsafe {
                 var baseAddrCopy = baseAddr;
                 int last = MemInstance.OffsetAddress(ref baseAddrCopy, 0, 0);
@@ -41,6 +46,7 @@ namespace AmongUsCapture
                 fixed (byte* ptr = buffer) {
                     var buffptr = (IntPtr) ptr;
                     PlayerId = Marshal.ReadByte(buffptr, pOf.PlayerIDOffset);
+                    
                     Disconnected = Marshal.ReadByte(buffptr, pOf.DisconnectedOffset) > 0;
                     Tasks = Marshal.ReadIntPtr(buffptr, pOf.TasksOffset);
                     IsDead = Marshal.ReadByte(buffptr, pOf.IsDeadOffset) > 0;
@@ -53,7 +59,23 @@ namespace AmongUsCapture
 
                     // Read from PlayerOutfit
                     PlayerName = MemInstance.ReadString(MemInstance.Read<IntPtr>(outfit, oOf.PlayerNameOffset), CurrentOffsets.StringOffsets[0], CurrentOffsets.StringOffsets[1]);
-                    ColorId = (PlayerColor)(uint)MemInstance.Read<int>(outfit, oOf.ColorIDOffset);
+                    var TryColorId = (uint)MemInstance.Read<int>(outfit, oOf.ColorIDOffset);
+                    
+                    var ColorIdNum = (PlayerColor)(uint)MemInstance.Read<int>(outfit, oOf.ColorIDOffset);
+                    realColorID = (uint)MemInstance.Read<int>(outfit, oOf.ColorIDOffset);
+                    if (Enum.IsDefined(typeof(PlayerColor), ColorIdNum)) {
+                        ColorId = (PlayerColor) ColorIdNum;
+                    }
+                    else {
+                        LogCastError = true;
+                    }
+
+                    
+                    // Console.WriteLine("ColorId: " + ColorIdNum);
+                    // Console.WriteLine("realColorID: " + (PlayerColor)realColorID);
+                    // Console.WriteLine("Id: " + TryColorId + "<->" + "RealColor: " + ColorId);
+                    // Logger.Debug("Id: " + TryColorId + "<->" + "RealColor: " + ColorId);
+                    
                     // TODO: Since IDs are changed from enum to string like "hat_police", renaming or mapping existing svgs to string is required
                     // TODO: As a workaround just fill with 0 as IDs
                     //HatId = MemInstance.ReadString(MemInstance.Read<IntPtr>(outfit, oOf.HatIDOffset), CurrentOffsets.StringOffsets[0], CurrentOffsets.StringOffsets[1]);
@@ -63,6 +85,13 @@ namespace AmongUsCapture
                     PetId = 0;
                     SkinId = 0;
                 }
+
+                if (LogCastError) {
+                    if (!UnknownColors.Contains(realColorID)) {
+                    Logger.Debug($"UNKNOWN COLOR. NAME:{GetPlayerName()}, COLOR: {realColorID}");
+                    UnknownColors.Add(realColorID);
+                }
+            }
             }
         }
         public string GetPlayerName() {
